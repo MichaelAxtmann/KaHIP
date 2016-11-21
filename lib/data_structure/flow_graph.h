@@ -5,6 +5,7 @@
  * 
  ******************************************************************************
  * Copyright (C) 2013-2015 Christian Schulz <christian.schulz@kit.edu>
+ * Copyright (C) 2016 Michael Axtmann <michael.axtmann@kit.edu>
  *
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -23,6 +24,7 @@
 #ifndef FLOW_GRAPH_636S5L2S
 #define FLOW_GRAPH_636S5L2S
 
+#include <assert.h>
 #include "definitions.h"
 
 struct rEdge {
@@ -66,10 +68,16 @@ public:
         EdgeID number_of_edges() {return m_num_edges;};
 
         NodeID getEdgeTarget(NodeID source, EdgeID e);
-        NodeID getEdgeCapacity(NodeID source, EdgeID e);
+        FlowType getEdgeCapacity(NodeID source, EdgeID e);
 
         FlowType getEdgeFlow(NodeID source, EdgeID e);
         void setEdgeFlow(NodeID source, EdgeID e, FlowType flow);
+
+        FlowType getEdgeResFlow(NodeID source, EdgeID e);
+        bool isSaturated(NodeID source, EdgeID e);
+        void increaseEdgeFlow(NodeID source, EdgeID e, FlowType flow);
+        EdgeID get_first_flow_edge(NodeID node);
+        EdgeID get_next_flow_edge(NodeID node, EdgeID e);
 
         EdgeID getReverseEdge(NodeID source, EdgeID e);
         
@@ -91,7 +99,7 @@ private:
 };
 
 inline
-NodeID flow_graph::getEdgeCapacity(NodeID source, EdgeID e) {
+FlowType flow_graph::getEdgeCapacity(NodeID source, EdgeID e) {
 #ifdef NDEBUG
         return m_adjacency_lists[source][e].capacity;        
 #else
@@ -106,6 +114,35 @@ void flow_graph::setEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
 #else
         m_adjacency_lists.at(source).at(e).flow = flow;        
 #endif
+};
+
+inline
+void flow_graph::increaseEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
+    // TODO ... implement method
+};
+
+inline
+EdgeID flow_graph::get_first_flow_edge(NodeID node) {
+    // TODO ... implement method
+    return e;
+};
+
+inline
+EdgeID flow_graph::get_next_flow_edge(NodeID node, EdgeID e) {
+    // TODO ... implement method
+    return e;
+};
+
+inline
+FlowType flow_graph::getEdgeResFlow(NodeID source, EdgeID e) {
+    // TODO ... implement method
+    return ... ;
+};
+
+inline
+bool flow_graph::isSaturated(NodeID source, EdgeID e) {
+    // TODO ... implement method
+    return ...;
 };
 
 inline

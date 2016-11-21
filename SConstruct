@@ -5,6 +5,7 @@
 # *
 # ******************************************************************************
 # * Copyright (C) 2015 Christian Schulz <christian.schulz@kit.edu>
+# * Copyright (C) 2016 Michael Axtmann <michael.axtmann@kit.edu>
 # *
 # * This program is free software: you can redistribute it and/or modify it
 # * under the terms of the GNU General Public License as published by the Free
@@ -58,7 +59,7 @@ def GetEnvironment():
     print 'Illegal value for variant: %s' % env['variant']
     sys.exit(1)
   
-  if not env['program'] in ['kaffpa', 'kaffpaE', 'partition_to_vertex_separator','improve_vertex_separator','library','graphchecker','label_propagation','evaluator','node_separator']:
+  if not env['program'] in ['kaffpa', 'kaffpaE', 'partition_to_vertex_separator','improve_vertex_separator','library','graphchecker','label_propagation','evaluator','node_separator','example','maxflow']:
     print 'Illegal value for program: %s' % env['program']
     sys.exit(1)
 
@@ -117,8 +118,8 @@ elif env['variant'] == 'optimized_output':
   env.Append(CXXFLAGS = ' -DNDEBUG -funroll-loops -Wall -fno-stack-limit -O3 -std=c++0x')
   env.Append(CCFLAGS  = '-O3  -DNDEBUG -DKAFFPAOUTPUT  -std=c++0x')
 else:
-  env.Append(CXXFLAGS = ' -DNDEBUG -Wall -funroll-loops  -fno-stack-limit -O3 -std=c++0x')
-  env.Append(CCFLAGS  = '-O3  -DNDEBUG -funroll-loops -std=c++0x ')
+  env.Append(CXXFLAGS = ' -g -Wall -funroll-loops  -fno-stack-limit -std=c++0x')
+  env.Append(CCFLAGS  = '-g   -funroll-loops -std=c++0x ')
   if SYSTEM != 'Darwin':
         env.Append(CXXFLAGS = '-march=native')
         env.Append(CCFLAGS  = '-march=native')

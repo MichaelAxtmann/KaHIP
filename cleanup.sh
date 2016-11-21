@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+scons program=maxflow variant=optimized -j 4 -c 
 scons program=kaffpa variant=optimized -j 4 -c 
 scons program=kaffpaE variant=optimized -j 4 -c 
 scons program=partition_to_vertex_separator variant=optimized -j 4 -c

@@ -5,6 +5,7 @@
 # *
 # ******************************************************************************
 # * Copyright (C) 2015 Christian Schulz <christian.schulz@kit.edu>
+# * Copyright (C) 2016 Michael Axtmann <michael.axtmann@kit.edu>
 # *
 # * This program is free software: you can redistribute it and/or modify it
 # * under the terms of the GNU General Public License as published by the Free
@@ -40,6 +41,7 @@ libkaffpa_files = [   'lib/data_structure/graph_hierarchy.cpp',
                       'lib/algorithms/topological_sort.cpp',
                       'lib/algorithms/push_relabel.cpp',
                       'lib/io/graph_io.cpp',
+                      'lib/io/flow_graph_io.cpp',
                       'lib/tools/quality_metrics.cpp',
                       'lib/tools/random_functions.cpp',
                       'lib/tools/graph_extractor.cpp',
@@ -156,6 +158,16 @@ if env['program'] == 'graphchecker':
         env.Append(CXXFLAGS = '-DMODE_GRAPHCHECKER')
         env.Append(CCFLAGS  = '-DMODE_GRAPHCHECKER')
         env.Program('graphchecker', ['app/graphchecker.cpp'], LIBS=['libargtable2','gomp'])
+
+if env['program'] == 'example':
+        env.Append(CXXFLAGS = '-DMODE_EXAMPLE')
+        env.Append(CCFLAGS  = '-DMODE_EXAMPLE')
+        env.Program('example', ['app/bfs/bfs.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
+
+if env['program'] == 'maxflow':
+        env.Append(CXXFLAGS = '-DMODE_EXAMPLE')
+        env.Append(CCFLAGS  = '-DMODE_EXAMPLE')
+        env.Program('maxflow', ['app/ford_fulkerson/ford_fulkerson.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
 
 if env['program'] == 'library':
         env.Append(CXXFLAGS = '-fPIC')
