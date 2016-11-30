@@ -49,13 +49,27 @@ int main(int argc, char *argv[]) {
     std::vector<NodeID> nodes;
     std::vector<EdgeID> edges;
 
-    // TODO ... find augmenting path
-    auto aug_flow = ...; 
+    // find augmenting path
+    auto aug_flow = res_graph_dfs(G, nodes, edges, source, sink);
     while (aug_flow > 0) {
-        // TODO ... apply path and try to find a new path
-        ...
+        // ... apply path and try to find a new path
+        flow += aug_flow;
+        std::cout << "flow found. Cap: " << aug_flow
+                  << "\ttotal flow: " << flow << std::endl;
+        // apply flow to graph
+        for (size_t edge_index = 0; edge_index != edges.size(); ++edge_index) {
+            auto e = edges[edge_index];
+            auto source = nodes[edge_index];
+            auto target = G.getEdgeTarget(source, e);
+            G.increaseEdgeFlow(source, e, aug_flow);
+            auto reverse_e = G.getReverseEdge(source, e);
+            G.increaseEdgeFlow(target, reverse_e, -aug_flow);
+        }
+        nodes.clear();
+        edges.clear();
+        aug_flow = res_graph_dfs(G, nodes, edges, source, sink);
     }
-
+    
     // max flow has been found
     std::cout << "Max flow: " << flow << std::endl;
     return 0;

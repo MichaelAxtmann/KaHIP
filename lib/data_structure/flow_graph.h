@@ -76,8 +76,25 @@ public:
         FlowType getEdgeResFlow(NodeID source, EdgeID e);
         bool isSaturated(NodeID source, EdgeID e);
         void increaseEdgeFlow(NodeID source, EdgeID e, FlowType flow);
-        EdgeID get_first_flow_edge(NodeID node);
-        EdgeID get_next_flow_edge(NodeID node, EdgeID e);
+        EdgeID get_first_flow_edge(NodeID node) {
+            EdgeID e_end = get_first_invalid_edge(node);
+            EdgeID e = 0;
+            
+            while(e != e_end && isSaturated(node, e)) {
+                e++;
+            }
+            return e;
+        };
+        EdgeID get_next_flow_edge(NodeID node, EdgeID e) {
+            EdgeID e_end = get_first_invalid_edge(node);
+            assert(e_end != e);
+            e++;
+            
+            while(e != e_end && isSaturated(node, e)) {
+                e++;
+            }
+            return e;
+        };
 
         EdgeID getReverseEdge(NodeID source, EdgeID e);
         
@@ -118,31 +135,21 @@ void flow_graph::setEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
 
 inline
 void flow_graph::increaseEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
-    // TODO ... implement method
-};
-
-inline
-EdgeID flow_graph::get_first_flow_edge(NodeID node) {
-    // TODO ... implement method
-    return e;
-};
-
-inline
-EdgeID flow_graph::get_next_flow_edge(NodeID node, EdgeID e) {
-    // TODO ... implement method
-    return e;
+#ifdef NDEBUG
+    m_adjacency_lists[source][e].flow += flow;
+#else
+    m_adjacency_lists.at(source).at(e).flow += flow;        
+#endif
 };
 
 inline
 FlowType flow_graph::getEdgeResFlow(NodeID source, EdgeID e) {
-    // TODO ... implement method
-    return ... ;
+    return this->getEdgeCapacity(source, e) - this->getEdgeFlow(source, e);
 };
 
 inline
 bool flow_graph::isSaturated(NodeID source, EdgeID e) {
-    // TODO ... implement method
-    return ...;
+    return this->getEdgeResFlow(source, e) == 0;
 };
 
 inline
