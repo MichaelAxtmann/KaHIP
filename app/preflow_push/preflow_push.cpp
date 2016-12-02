@@ -28,10 +28,10 @@
 #include "data_structure/graph_access.h"
 #include "flow_graph_io.h"
 
-#define AGGRESSIVE_RELABELING
+// #define AGGRESSIVE_RELABELING
 // Perform highest level first (instead of fifo).
-#define HIGHEST_LEVEL_FIRST
-#define TWO_PHASE_APPROACH
+// #define HIGHEST_LEVEL_FIRST
+// #define TWO_PHASE_APPROACH
 
 struct NodeData {
     NodeData(NodeID node_cnt)
