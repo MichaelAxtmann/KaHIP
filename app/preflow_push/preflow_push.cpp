@@ -147,12 +147,90 @@ FlowType PreflowPush::preflow_push(flow_graph& G, NodeID source, NodeID sink) {
 
 inline
 void PreflowPush::low_level_preflow_push(flow_graph& G, NodeID source, NodeID sink) {
-    // todo
+
+    while (!small_active_nodes_.empty()) {
+#ifdef HIGHEST_LEVEL_FIRST
+        const NodeID active_node = small_active_nodes_.top().v;
+#else
+        const NodeID active_node = small_active_nodes_.front();
+#endif
+        small_active_nodes_.pop();
+
+        // Request first eligible edge.
+        EdgeID e_eligible = get_next_eligible_edge(G, active_node);
+            
+        // Push access as long as possible.
+        while (node_data_[active_node].access > 0 &&
+               G.isValidEdge(active_node, e_eligible)) {
+            const EdgeID flow = max_allowed_res_flow(G, active_node, e_eligible);
+            low_level_push(G, active_node, e_eligible, flow);
+
+            // Request next eligible edge.
+            e_eligible = get_next_eligible_edge(G, active_node);
+        }
+
+        // No eligible edge available but access remains.
+        if (node_data_[active_node].access > 0)
+        {
+            relabel(active_node);
+
+            // Add node to list of active nodes.
+#ifdef HIGHEST_LEVEL_FIRST
+            if (node_data_[active_node].level < node_cnt_) {
+                small_active_nodes_.emplace(active_node, node_data_[active_node].level);
+            } else {
+                active_nodes_.emplace(active_node, node_data_[active_node].level);
+            }
+#else
+            if (node_data_[active_node].level < node_cnt_) {
+                small_active_nodes_.emplace(active_node);
+            } else {
+                active_nodes_.emplace(active_node);
+            }
+#endif
+        }
+    }
 }    
 
 inline
 FlowType PreflowPush::remaining_level_preflow_push(flow_graph& G, NodeID source, NodeID sink) {
-    // todo
+
+    while (!active_nodes_.empty()) {
+#ifdef HIGHEST_LEVEL_FIRST
+        const NodeID active_node = active_nodes_.top().v;
+#else
+        const NodeID active_node = active_nodes_.front();
+#endif
+        active_nodes_.pop();
+
+        // Request first eligible edge.
+        EdgeID e_eligible = get_next_eligible_edge(G, active_node);
+
+        // Push access as long as possible.
+        while (node_data_[active_node].access > 0 && G.isValidEdge(active_node, e_eligible)) {
+            const EdgeID flow = max_allowed_res_flow(G, active_node, e_eligible);
+            push(G, active_node, e_eligible, flow);
+
+            // Request next eligible edge.
+            e_eligible = get_next_eligible_edge(G, active_node);
+        }
+
+        // No eligible edge available but access remains.
+        if (node_data_[active_node].access > 0)
+        {
+            relabel(active_node);
+
+            // Add node to list of active nodes.
+#ifdef HIGHEST_LEVEL_FIRST
+            active_nodes_.emplace(active_node, node_data_[active_node].level);
+#else
+            active_nodes_.emplace(active_node);
+#endif
+        }
+    }
+
+    // Calculate max flow.
+    return get_outgoing_flow(G, source_);
 }                
 
 inline
