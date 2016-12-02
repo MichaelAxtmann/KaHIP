@@ -167,7 +167,7 @@ if env['program'] == 'maxflow':
 if env['program'] == 'preflow':
         env.Append(CXXFLAGS = '-DMODE_EXAMPLE')
         env.Append(CCFLAGS  = '-DMODE_EXAMPLE')
-        env.Program('preflow', ['app/fifo_preflow_push/fifo_preflow_push.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
+        env.Program('preflow', ['app/preflow_push/preflow_push.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
 
 if env['program'] == 'library':
         env.Append(CXXFLAGS = '-fPIC')

@@ -23,6 +23,7 @@
 
 #include <queue>
 #include <stdlib.h>
+#include <chrone>
 
 #include "data_structure/flow_graph.h"
 #include "data_structure/graph_access.h"
@@ -270,6 +271,8 @@ FlowType PreflowPush::get_outgoing_flow(const flow_graph& G, EdgeID edge) const 
     } endfor;
     return flow;
 }
+
+using namespace std::chrono;
 int main(int argc, char *argv[]) {
     if (argc > 1) {
     }
@@ -280,16 +283,37 @@ int main(int argc, char *argv[]) {
 
     std::string file_name = argv[1];
 
+    // Read graph.
     flow_graph G;
     NodeID     source;
     NodeID     sink;
     flow_graph_io::readDIMACS(G, file_name, source, sink);
     std::cout << "source: " << source << std::endl;
     std::cout << "sink: " << sink << std::endl;
- 
+
+    // Info output.
+    std::cout << "Preflow push." << std::endl;
+#ifdef AGGRESSIVE_RELABELING
+    std::cout << "\tAGGRESSIVE_RELABELING" << std::endl;
+#endif
+#ifdef HIGHEST_LEVEL_FIRST
+    std::cout << "\tHIGHEST_LEVEL_FIRST" << std::endl;
+#endif
+#ifdef TWO_PHASE_APPROACH
+    std::cout << "\tTWO_PHASE_APPROACH" << std::endl;
+#endif
+
+    // Execute algorithm.
+    std::cout << "Pending..." << std::endl;
+    auto start_time = system_clock::now();
     FlowType flow = PreflowPush().preflow_push(G, source, sink);
-    
+    auto end_time = system_clock::now();
+    std::cout << "Terminated." << std::endl;
+    auto diff = duration_cast<milliseconds>(end_time - start_time).count();
+
+    // Info output.
+    std::cout << "time:\t\t" << diff << " ms" << std::endl;
     // max flow has been found
-    std::cout << "Max flow: " << flow << std::endl;
+    std::cout << "Max flow:\t" << flow << std::endl;
     return 0;
 }
