@@ -67,15 +67,26 @@ public:
         NodeID number_of_nodes() {return m_num_nodes;};
         EdgeID number_of_edges() {return m_num_edges;};
 
-        NodeID getEdgeTarget(NodeID source, EdgeID e);
-        FlowType getEdgeCapacity(NodeID source, EdgeID e);
+        NodeID getEdgeTarget(NodeID source, EdgeID e) const;
+        FlowType getEdgeCapacity(NodeID source, EdgeID e) const;
 
-        FlowType getEdgeFlow(NodeID source, EdgeID e);
+        FlowType getEdgeFlow(NodeID source, EdgeID e) const ;
+
+        // set flow of a single edge
         void setEdgeFlow(NodeID source, EdgeID e, FlowType flow);
 
-        FlowType getEdgeResFlow(NodeID source, EdgeID e);
-        bool isSaturated(NodeID source, EdgeID e);
+        // set flow of forward and reverse edge
+        void updateEdgeFlow(NodeID source, EdgeID e, FlowType flow);
+
+        FlowType getEdgeResCapacity(NodeID source, EdgeID e) const ;
+
+        bool isSaturated(NodeID source, EdgeID e) const;
+
+        // increases edge flow of edge and decreases flow of reverse edge
         void increaseEdgeFlow(NodeID source, EdgeID e, FlowType flow);
+
+        bool isValidEdge(NodeID v, EdgeID e) const;
+
         EdgeID get_first_flow_edge(NodeID node) {
             EdgeID e_end = get_first_invalid_edge(node);
             EdgeID e = 0;
@@ -85,6 +96,7 @@ public:
             }
             return e;
         };
+
         EdgeID get_next_flow_edge(NodeID node, EdgeID e) {
             EdgeID e_end = get_first_invalid_edge(node);
             assert(e_end != e);
@@ -96,17 +108,18 @@ public:
             return e;
         };
 
-        EdgeID getReverseEdge(NodeID source, EdgeID e);
+        EdgeID getReverseEdge(NodeID source, EdgeID e) const;
         
         void new_edge(NodeID source, NodeID target, FlowType capacity) {
-               m_adjacency_lists[source].push_back(rEdge(source, target, capacity, 0, m_adjacency_lists[target].size()));
-               // for each edge we add a reverse edge
-               m_adjacency_lists[target].push_back(rEdge(target, source, 0, 0, m_adjacency_lists[source].size() - 1));
-               m_num_edges += 2;
+            assert(capacity > 0);
+            m_adjacency_lists[source].push_back(rEdge(source, target, capacity, 0, m_adjacency_lists[target].size()));
+            // for each edge we add a reverse edge
+            m_adjacency_lists[target].push_back(rEdge(target, source, 0, 0, m_adjacency_lists[source].size() - 1));
+            m_num_edges += 2;
         };
 
-        EdgeID get_first_edge(NodeID node) {return 0;};
-        EdgeID get_first_invalid_edge(NodeID node) {return m_adjacency_lists[node].size();};
+        EdgeID get_first_edge(NodeID node) const {return 0;};
+        EdgeID get_first_invalid_edge(NodeID node) const {return m_adjacency_lists[node].size();};
 
 
 private:
@@ -116,53 +129,72 @@ private:
 };
 
 inline
-FlowType flow_graph::getEdgeCapacity(NodeID source, EdgeID e) {
+FlowType flow_graph::getEdgeCapacity(NodeID source, EdgeID e) const {
 #ifdef NDEBUG
-        return m_adjacency_lists[source][e].capacity;        
+    return m_adjacency_lists[source][e].capacity;        
 #else
-        return m_adjacency_lists.at(source).at(e).capacity;        
+    return m_adjacency_lists.at(source).at(e).capacity;        
 #endif
+    
 };
 
 inline
 void flow_graph::setEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
 #ifdef NDEBUG
-        m_adjacency_lists[source][e].flow = flow;        
+    m_adjacency_lists[source][e].flow = flow;        
 #else
-        m_adjacency_lists.at(source).at(e).flow = flow;        
+    m_adjacency_lists.at(source).at(e).flow = flow;        
 #endif
+}
+
+inline
+void flow_graph::updateEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
+    setEdgeFlow(source, e, flow);
+
+    // reverse edge
+    NodeID target = getEdgeTarget(source, e);
+    EdgeID e_rev = getReverseEdge(source, e);
+    setEdgeFlow(target, e_rev, -flow);
 };
 
 inline
 void flow_graph::increaseEdgeFlow(NodeID source, EdgeID e, FlowType flow) {
+    auto prev_flow = getEdgeFlow(source, e);
+    updateEdgeFlow(source, e, prev_flow + flow);
+};
+
+inline
+bool flow_graph::isValidEdge(NodeID v, EdgeID e) const {
+    return e != get_first_invalid_edge(v);
+}
+
+inline
+FlowType flow_graph::getEdgeResCapacity(NodeID source, EdgeID e) const {
 #ifdef NDEBUG
-    m_adjacency_lists[source][e].flow += flow;
+    const FlowType e_cap = m_adjacency_lists[source][e].capacity;        
 #else
-    m_adjacency_lists.at(source).at(e).flow += flow;        
+    const FlowType e_cap = m_adjacency_lists.at(source).at(e).capacity;        
+#endif
+    return e_cap - this->getEdgeFlow(source, e);
+
+};
+
+inline
+bool flow_graph::isSaturated(NodeID source, EdgeID e) const {
+    return this->getEdgeResCapacity(source, e) == 0;
+};
+
+inline
+FlowType flow_graph::getEdgeFlow(NodeID source, EdgeID e) const {
+#ifdef NDEBUG
+    return m_adjacency_lists[source][e].flow;        
+#else
+    return m_adjacency_lists.at(source).at(e).flow;        
 #endif
 };
 
 inline
-FlowType flow_graph::getEdgeResFlow(NodeID source, EdgeID e) {
-    return this->getEdgeCapacity(source, e) - this->getEdgeFlow(source, e);
-};
-
-inline
-bool flow_graph::isSaturated(NodeID source, EdgeID e) {
-    return this->getEdgeResFlow(source, e) == 0;
-};
-
-inline
-FlowType flow_graph::getEdgeFlow(NodeID source, EdgeID e) {
-#ifdef NDEBUG
-        return m_adjacency_lists[source][e].flow;        
-#else
-        return m_adjacency_lists.at(source).at(e).flow;        
-#endif
-};
-
-inline
-NodeID flow_graph::getEdgeTarget(NodeID source, EdgeID e) {
+NodeID flow_graph::getEdgeTarget(NodeID source, EdgeID e) const {
 #ifdef NDEBUG
         return m_adjacency_lists[source][e].target;        
 #else
@@ -171,7 +203,7 @@ NodeID flow_graph::getEdgeTarget(NodeID source, EdgeID e) {
 };
 
 inline
-EdgeID flow_graph::getReverseEdge(NodeID source, EdgeID e) {
+EdgeID flow_graph::getReverseEdge(NodeID source, EdgeID e) const {
 #ifdef NDEBUG
         return m_adjacency_lists[source][e].reverse_edge_index;
 #else

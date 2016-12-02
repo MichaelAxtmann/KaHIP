@@ -84,7 +84,7 @@ FlowType res_graph_dfs(graph& G,
     for (size_t node_idx = 0; node_idx != nodes.size(); ++node_idx) {
         auto v = nodes[node_idx];
         auto e = edges[node_idx];
-        auto res_edge_flow = G.getEdgeResFlow(v,e);
+        auto res_edge_flow = G.getEdgeResCapacity(v,e);
         res_flow = std::min(res_flow, res_edge_flow);
     }
     return res_flow;

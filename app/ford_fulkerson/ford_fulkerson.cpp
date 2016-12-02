@@ -54,16 +54,11 @@ int main(int argc, char *argv[]) {
     while (aug_flow > 0) {
         // ... apply path and try to find a new path
         flow += aug_flow;
-        std::cout << "flow found. Cap: " << aug_flow
-                  << "\ttotal flow: " << flow << std::endl;
         // apply flow to graph
         for (size_t edge_index = 0; edge_index != edges.size(); ++edge_index) {
             auto e = edges[edge_index];
             auto source = nodes[edge_index];
-            auto target = G.getEdgeTarget(source, e);
             G.increaseEdgeFlow(source, e, aug_flow);
-            auto reverse_e = G.getReverseEdge(source, e);
-            G.increaseEdgeFlow(target, reverse_e, -aug_flow);
         }
         nodes.clear();
         edges.clear();

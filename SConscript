@@ -159,15 +159,15 @@ if env['program'] == 'graphchecker':
         env.Append(CCFLAGS  = '-DMODE_GRAPHCHECKER')
         env.Program('graphchecker', ['app/graphchecker.cpp'], LIBS=['libargtable2','gomp'])
 
-if env['program'] == 'example':
-        env.Append(CXXFLAGS = '-DMODE_EXAMPLE')
-        env.Append(CCFLAGS  = '-DMODE_EXAMPLE')
-        env.Program('example', ['app/bfs/bfs.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
-
 if env['program'] == 'maxflow':
         env.Append(CXXFLAGS = '-DMODE_EXAMPLE')
         env.Append(CCFLAGS  = '-DMODE_EXAMPLE')
         env.Program('maxflow', ['app/ford_fulkerson/ford_fulkerson.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
+
+if env['program'] == 'preflow':
+        env.Append(CXXFLAGS = '-DMODE_EXAMPLE')
+        env.Append(CCFLAGS  = '-DMODE_EXAMPLE')
+        env.Program('preflow', ['app/fifo_preflow_push/fifo_preflow_push.cpp']+libkaffpa_files, LIBS=['libargtable2','gomp'])
 
 if env['program'] == 'library':
         env.Append(CXXFLAGS = '-fPIC')

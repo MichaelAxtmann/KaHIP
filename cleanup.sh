@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+scons program=preflow variant=optimized -j 4 -c 
 scons program=maxflow variant=optimized -j 4 -c 
 scons program=kaffpa variant=optimized -j 4 -c 
 scons program=kaffpaE variant=optimized -j 4 -c 
